@@ -1,34 +1,31 @@
-# US Accidents Severity Prediction 🚗
+# 🚗 US Accidents Severity Prediction (AI & Expert Systems)
 
-## 📌 Project Overview
-This project uses machine learning to predict the severity of traffic accidents across the United States. The dataset comprises **7.7 million** raw traffic accident records (from Kaggle) containing weather conditions, road features, and temporal data.
+## 📌 Overview
+This project predicts the severity of traffic accidents across the United States using a raw dataset of **7.7 million records**. The goal was to build a robust machine learning pipeline that handles severe class imbalance, optimizes for real-world safety (catching severe crashes), and serves predictions via a modern web interface.
 
-This project specifically addresses **class imbalance** (severe crashes are rare) and uses **Optuna** for hyperparameter tuning to build a robust, explainable model.
+## 📊 The Dataset (Raw & Messy)
+- **Source:** [Kaggle - US Accidents (Sobhan Moosavi)](https://www.kaggle.com/datasets/sobhanmoosavi/us-accidents)
+- **Size:** 7,728,394 rows, 46 columns.
+- **Data Cleaning Proof:** The raw dataset contains >93% missing values in `Precipitation(in)`, which we dropped. We also imputed missing weather data using median values and converted corrupted timestamp strings into usable datetime objects.
 
-## 👥 Team Members
-- Adnan Khalique (and [Add your team members' names here])
+## 🧠 The Modeling Challenge (Class Imbalance)
+Initial baselines using default XGBoost achieved **78% accuracy**, but the model entirely ignored Severity 1 and Severity 4 crashes because they make up less than 1% of the data. 
 
-## 📊 Dataset Source & Messiness
-- **Source:** [US Accidents (2016 - 2023)](https://www.kaggle.com/datasets/sobhanmoosavi/us-accidents) (CC BY-NC-SA 4.0).
-- **Raw Data Quality:** The dataset was intentionally kept raw to demonstrate real-world preprocessing. It contains >93% missing values in `Precipitation(in)`, duplicate entries, and unparsed datetime strings. 
+To solve this, we applied **Threshold Tuning**. We trained the model normally, then applied custom weights `[2.0, 1.0, 2.5, 5.0]` to the output probabilities. 
+- **Final Accuracy:** 73.14% (Exceeds the 70% requirement).
+- **Severity 3 Recall:** Jumped from 8% to 48%. 
+- **Reference Paper:** Adapts strategies from 2025 IEEE research on XAI and class imbalance in traffic severity datasets.
 
-## ⚙️ Pipeline Architecture
-1. **Ingestion (`src/data/load.py`):** Loads specified columns directly from the 3GB CSV to save RAM.
-2. **Cleaning (`src/data/clean.py`):** Drops high-missingness columns, parses datetimes, imputes missing weather data, and removes rows lacking target labels.
-3. **Feature Engineering (`src/features/build.py`):** Extracts `Hour`, `Day_of_Week`, `Is_Weekend`, and converts categorical weather into numerical codes.
-4. **Modeling (`src/models/train.py`):** Uses XGBoost with `compute_class_weight` to handle class imbalance, optimized via Optuna.
+## ⚙️ Project Structure
+- `src/data/`: Scripts for loading and cleaning 7.7M rows.
+- `src/features/`: Feature engineering (time extraction, categorical encoding).
+- `src/models/`: Training scripts and evaluation metrics.
+- `app/main.py`: The NiceGUI interactive dashboard.
+- `models/`: Pre-trained XGBoost model (`final_model.json`) and threshold weights.
 
-## 🚀 How to Run
-1. Clone the repo: `git clone https://github.com/adnanKHALIQxc/us-accidents-severity-prediction.git`
-2. Create environment: `python -m venv .venv`
-3. Activate environment: `.\.venv\Scripts\activate` (Windows)
-4. Install requirements: `pip install -r requirements.txt`
-5. Download the raw dataset and place it in `data/raw/`
-6. Run training: `python src/models/train.py`
-
-## 📈 Results
-*(To be filled after final model run)*
-
-- **Accuracy:** 70.XX%
-- **Macro F1 Score:** 0.XX
-- **Reference Paper:** Adapting class weight strategies inspired by 2025 XAI literature on accident severity.
+## 🚀 How to Run the App
+1. Create a virtual environment and install requirements:
+   ```bash
+   python -m venv .venv
+   .\.venv\Scripts\activate
+   pip install -r requirements.txt
