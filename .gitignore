@@ -1,0 +1,29 @@
+# Data (never commit raw/interim/processed)
+data/raw/*
+data/interim/*
+data/processed/*
+!data/**/.gitkeep
+*.csv
+*.parquet
+
+# Model artifacts
+models/*
+!models/.gitkeep
+*.pkl
+*.joblib
+*.ubj
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+*.egg-info/
+
+# Notebooks
+.ipynb_checkpoints/
+
+# OS / IDE
+.DS_Store
+.vscode/settings.json
